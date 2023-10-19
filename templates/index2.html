@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Captioning</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: #3498db;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input[type="file"] {
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #camera-feed {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 20px;
+            border: 1px solid #3498db;
+            border-radius: 5px;
+        }
+
+        #capture-button {
+            margin-top: 10px;
+        }
+
+        canvas {
+            display: block;
+            margin-top: 20px;
+            border: 1px solid #3498db;
+            border-radius: 5px;
+        }
+
+        p {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #3498db;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Image Captioning</h1>
+    <form method="POST" action='/upload' enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*">
+        <br><br>
+        <input type="submit" value="Generate Caption from Image">
+    </form>
+
+    <h2>OR</h2>
+
+    <h3>Capture an Image from Your Laptop Camera</h3>
+    <video id="camera-feed" autoplay></video>
+    <button id="capture-button">Capture</button>
+    <canvas id="captured-image" style="display: none;"></canvas>
+    <br>
+    <input type="button" value="Generate Caption from Captured Image" action='/'>
+
+    <br><br>
+    <p id="caption">
+        {% if caption %}
+            <h1>Captions: </h1>
+            <p>{{ caption }}</p>
+            <h1>Audio Player</h1>
+            <audio controls>
+                <source src="{{ url_for('download_audio', filename=audio) }}" type="audio/mpeg">
+                Your browser does not support the audio element.
+             </audio>
+
+        {% endif %}
+    </p>
+
+    <script>
+        const video = document.getElementById('camera-feed');
+        const captureButton = document.getElementById('capture-button');
+        const canvas = document.getElementById('captured-image');
+        const captionElement = document.getElementById('caption');
+
+        // Access the user's camera
+        async function setupCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+        }
+
+        // Capture an image from the camera feed
+        captureButton.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+            canvas.style.display = 'block';
+            video.style.display = 'none';
+            captureButton.style.display = 'none';
+        });
+
+        
+
+        setupCamera();
+    </script>
+</body>
+
+</html>

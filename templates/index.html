@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Image Captioning</title>
+    </head>
+    <body>
+        <h1>Image Captioning</h1>
+        <form method="POST" action='/upload' enctype="multipart/form-data" >
+            
+            <input type="file" name="image" accept="image/*">
+            <br><br>
+            <input type="submit" value="Generate Caption from Image">
+        
+        </form>
+        <h2>OR</h2>
+
+        <h3>Capture an Image from Your Laptop Camera</h3>
+        <video id="camera-feed" autoplay></video>
+        <button id="capture-button">Capture</button>
+        <canvas id="captured-image" style="display: none;"></canvas>
+        <br>
+        <input type="submit" value="Generate Caption from Captured Image" onclick="generateCaptionFromCamera()">
+    
+        <br><br>
+        {% if caption %}
+            <h1>Captions: </h1>
+            <p>{{ caption }}</p>
+        {% endif %}
+
+        <script>
+            const video = document.getElementById('camera-feed');
+            const captureButton = document.getElementById('capture-button');
+            const canvas = document.getElementById('captured-image');
+            
+            // Access the user's camera
+            async function setupCamera() {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            }
+
+            // Capture an image from the camera feed
+            captureButton.addEventListener('click', () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+                canvas.style.display = 'block';
+                video.style.display = 'none';
+                captureButton.style.display = 'none';
+            });
+
+            // Function to generate a caption from the captured image
+            function generateCaptionFromCamera() {
+                const capturedImage = canvas.toDataURL('image/jpeg');
+                // You can send this image data to your server for caption generation.
+                // Then display the caption as you did before.
+            }
+
+            setupCamera();
+        </script>
+    </body>
+</html>
